@@ -1,5 +1,7 @@
 'use strict';
 
+const numberOfPlayer = 2;
+
 // Select elements
 const scoreEls = document.querySelectorAll('.score');
 const diceEl = document.querySelector('.dice');
@@ -7,8 +9,6 @@ const btnNew = document.querySelector('.btn--new');
 const btnRoll = document.querySelector('.btn--roll');
 const btnHold = document.querySelector('.btn--hold');
 const currScoreEl = document.querySelector('.current-score');
-const player1El = document.querySelector('.player--0');
-const player2El = document.querySelector('.player--1');
 
 // function to set game to starting conditions
 function resetGame() {
@@ -32,15 +32,40 @@ function rollADie() {
   return randomNumber;
 }
 
+// Get the active player number return 0 for 1st player and 1 for 2nd player
+function getActivePlayerNumber() {
+  const playersEl = document.querySelectorAll('.player');
+  let i = 0;
+  for (; i < playersEl.length; i++) {
+    if (playersEl[i].classList.contains('player--active')) break;
+  }
+  return i;
+}
+
 // function to switch player
 function switchPlayer() {
-  if (player1El.classList.contains('player--active')) {
-    player1El.classList.remove('player--active');
-    player2El.classList.add('player--active');
-  } else {
-    player2El.classList.remove('player--active');
-    player1El.classList.add('player--active');
-  }
+  let i = getActivePlayerNumber();
+
+  let activePlayerEl = document.querySelector(`.player--${i}`);
+  activePlayerEl.classList.remove('player--active');
+  activePlayerEl.querySelector('.current-score').textContent = 0;
+
+  let otherPlayer = document.querySelector(
+    `.player--${numberOfPlayer - 1 - i}`
+  );
+  otherPlayer.classList.add('player--active');
+}
+
+// function to add rolled number to current socre of active player
+function addToCurrentScore(rolledNumber) {
+  let i = getActivePlayerNumber();
+  let activePlayerEl = document.querySelector(`.player--${i}`);
+  let currentScore = Number(
+    activePlayerEl.querySelector('.current-score').textContent
+  );
+  console.log(activePlayerEl.querySelector('.current-score').textContent);
+  activePlayerEl.querySelector('.current-score').textContent =
+    currentScore + rolledNumber;
 }
 
 // add click listener to roll button
@@ -49,6 +74,7 @@ btnRoll.addEventListener('click', function () {
 
   if (rolledNumber === 1) switchPlayer();
   else {
+    addToCurrentScore(rolledNumber);
   }
 });
 
