@@ -1,6 +1,8 @@
 'use strict';
 
 const numberOfPlayer = 2;
+let isPlaying = true;
+const winnigScore = 20;
 
 // Select elements
 const scoreEls = document.querySelectorAll('.score');
@@ -12,6 +14,7 @@ const currScoreEls = document.querySelectorAll('.current-score');
 
 // function to set game to starting conditions
 function resetGame() {
+  isPlaying = true;
   for (let element of scoreEls) element.textContent = 0;
   diceEl.classList.add('hidden');
   for (let element of currScoreEls) element.textContent = 0;
@@ -27,15 +30,17 @@ resetGame();
 
 // "roll a die" function return the rolled number (from 1 to 6)
 function rollADie() {
-  const randomNumber = Math.trunc(Math.random() * 6 + 1);
-  // console.log(`rolled number ${randomNumber}`);
+  if (isPlaying) {
+    const randomNumber = Math.trunc(Math.random() * 6 + 1);
+    // console.log(`rolled number ${randomNumber}`);
 
-  //display the die image corresponding to the rolled number
-  let text = 'dice-' + randomNumber + '.png';
-  diceEl.src = text;
-  diceEl.classList.remove('hidden');
+    //display the die image corresponding to the rolled number
+    let text = 'dice-' + randomNumber + '.png';
+    diceEl.src = text;
+    diceEl.classList.remove('hidden');
 
-  return randomNumber;
+    return randomNumber;
+  } else return 0;
 }
 
 // Get the active player number return 0 for 1st player and 1 for 2nd player
@@ -87,3 +92,26 @@ btnRoll.addEventListener('click', function () {
 
 // add click listener to new game button
 btnNew.addEventListener('click', resetGame);
+
+// add click listener to the hold buttn
+btnHold.addEventListener('click', function () {
+  if (isPlaying) {
+    let i = getActivePlayerNumber();
+    let activePlayerEl = document.querySelector(`.player--${i}`);
+    let activeCurrentScore = Number(
+      activePlayerEl.querySelector('.current-score').textContent
+    );
+    let activeScore = Number(
+      activePlayerEl.querySelector('.score').textContent
+    );
+    activePlayerEl.querySelector('.score').textContent =
+      activeCurrentScore + activeScore;
+
+    if (activeCurrentScore + activeScore < winnigScore) {
+      switchPlayer();
+    } else {
+      isPlaying = false;
+      diceEl.classList.add('hidden');
+    }
+  }
+});
